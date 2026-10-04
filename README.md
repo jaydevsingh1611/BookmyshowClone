@@ -1,9 +1,15 @@
-QuickShow — Movie Ticket Booking Platform
-A full-stack movie ticket booking platform built with React, Node.js, Express, MongoDB, Clerk, Stripe, TMDB, and Inngest.
+# QuickShow — Movie Ticket Booking Platform
+
+A full-stack movie ticket booking platform built with **React, Node.js, Express, MongoDB, Clerk, Stripe, TMDB, and Inngest**.
+
 The application supports movie discovery, show scheduling, seat selection, online payments, booking management, favorites, automated emails, and an admin dashboard.
-Project note: The repository is named BookmyshowClone, while the application/backend code uses names such as QuickShow and netShow. The README uses QuickShow as the product name.
-Features
-Customer experience
+
+---
+
+## Features
+
+### Customer Experience
+
 - Browse currently available movies and movie details
 - View ratings, genres, runtime, cast, overview, and release information
 - View upcoming show dates and times
@@ -15,7 +21,9 @@ Customer experience
 - Add/remove movies from favorites
 - Receive booking confirmation emails
 - Receive scheduled show reminders
-Admin experience
+
+### Admin Experience
+
 - Admin dashboard with:
   - Total bookings
   - Total revenue
@@ -27,7 +35,9 @@ Admin experience
 - View scheduled shows
 - View bookings
 - Delete shows associated with a movie
-Backend capabilities
+
+### Backend Capabilities
+
 - REST API built with Express
 - MongoDB persistence using Mongoose
 - Clerk-based authentication
@@ -39,41 +49,43 @@ Backend capabilities
 - Nodemailer-based transactional email delivery
 - Automatic release of unpaid seats after a timeout
 - User synchronization between Clerk and MongoDB
-Architecture
-                         ┌─────────────────────┐
-                         │       TMDB API      │
-                         │ Movie metadata/data  │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-┌──────────────────┐       ┌─────────────────────┐
-│                  │       │                     │
-│   React + Vite   │──────▶│  Express REST API   │
-│                  │ HTTP  │                     │
-└────────┬─────────┘       └───────┬─────────────┘
-         │                         │
-         │ Clerk                  │ Mongoose
-         ▼                         ▼
-┌──────────────────┐       ┌─────────────────────┐
-│  Clerk Auth      │       │      MongoDB        │
-│ Users / Roles    │       │ Movies / Shows /    │
-└──────────────────┘       │ Bookings / Users    │
-                           └──────────┬──────────┘
-                                      │
-                         ┌────────────┴────────────┐
-                         │                         │
-                         ▼                         ▼
-                 ┌───────────────┐        ┌────────────────┐
-                 │     Stripe    │        │    Inngest     │
-                 │   Checkout    │        │ Background     │
-                 │ + Webhooks    │        │ workflows/jobs │
-                 └───────────────┘        └───────┬────────┘
-                                                  │
-                                                  ▼
-                                           ┌─────────────┐
-                                           │   SMTP      │
-                                           │ Email/SMS*  │
-                                           └─────────────┘
+## Architecture
+
+```text
+                    ┌──────────────────┐
+                    │     TMDB API     │
+                    │  Movie Metadata  │
+                    └────────┬─────────┘
+                             │
+                             ▼
+┌─────────────────┐    ┌────────────────────┐
+│  React + Vite   │───▶│  Express REST API  │
+│    Frontend     │    │      Backend       │
+└────────┬────────┘    └─────────┬──────────┘
+         │                       │
+         │ Clerk                 │ Mongoose
+         ▼                       ▼
+┌─────────────────┐    ┌────────────────────┐
+│  Clerk Auth     │    │      MongoDB       │
+│ Users & Roles   │    │ Movies / Shows /   │
+└─────────────────┘    │ Bookings / Users   │
+                       └─────────┬──────────┘
+                                 │
+                    ┌────────────┴────────────┐
+                    │                         │
+                    ▼                         ▼
+             ┌─────────────┐          ┌─────────────┐
+             │   Stripe    │          │   Inngest   │
+             │  Checkout   │          │  Workflows  │
+             │ + Webhooks  │          │ & Jobs      │
+             └─────────────┘          └──────┬──────┘
+                                             │
+                                             ▼
+                                      ┌─────────────┐
+                                      │  Nodemailer │
+                                      │    SMTP     │
+                                      └─────────────┘
+```
 * Email delivery is implemented through SMTP using Nodemailer.
 Tech Stack
 Frontend
@@ -105,10 +117,23 @@ Database & external services
 - SMTP / Brevo
 Deployment
 - Vercel configuration is included for both client and server.
-Core Data Model
+
+## Core Data Model
+
 The backend currently uses four main MongoDB models.
-Movie
-Stores movie metadata retrieved from TMDB.   
+
+### Movie
+
+Stores movie metadata retrieved from TMDB.  
+## Core Data Model
+
+The backend currently uses four main MongoDB models.
+
+### Movie
+
+Stores movie metadata retrieved from TMDB.
+
+```text
 Movie
 ├── title
 ├── overview
@@ -120,17 +145,28 @@ Movie
 ├── genres
 ├── casts
 ├── vote_average
-└── runtime         
-Show
-Represents a scheduled screening.  
+└── runtime
+```
+
+### Show
+
+Represents a scheduled screening.
+
+```text
 Show
 ├── movie
 ├── showDateTime
 ├── showPrice
-└── occupiedSeats                        
-occupiedSeats stores seat-to-user mappings for the show.
-Booking
+└── occupiedSeats
+```
+
+`occupiedSeats` stores seat-to-user mappings for the show.
+
+### Booking
+
 Represents a customer's booking and payment state.
+
+```text
 Booking
 ├── user
 ├── show
@@ -140,15 +176,23 @@ Booking
 ├── paymentLink
 ├── createdAt
 └── updatedAt
-User
+```
+
+### User
+
 Stores synchronized user information from Clerk.
+
+```text
 User
 ├── _id
 ├── name
 ├── email
 └── image
-Booking Flow
+```
+### Booking Flow
 The booking flow is one of the main backend workflows in the project.
+
+```text
 1. User selects a show
         ↓
 2. Frontend requests occupied seats
@@ -172,8 +216,12 @@ The booking flow is one of the main backend workflows in the project.
 11. Booking is marked as paid
         ↓
 12. Inngest sends confirmation email
-Unpaid booking cleanup
+```
+## Unpaid Booking Cleanup
+
 If payment is not completed within the configured period:
+
+```text
 Booking created
       ↓
 Wait 10 minutes
@@ -185,10 +233,16 @@ Not paid?
 Release occupied seats
       ↓
 Delete booking
+```
+
 This is handled through an Inngest workflow rather than relying only on a frontend timer.
-Stripe Payment Integration
+
+## Stripe Payment Integration
+
 Stripe Checkout is used for payment processing.
+
 When a booking is created, the backend:
+
 1. Validates the selected seats.
 2. Calculates the booking amount.
 3. Creates a booking record.
@@ -196,53 +250,100 @@ When a booking is created, the backend:
 5. Stores the generated payment link.
 6. Associates the booking ID with Stripe session metadata.
 7. Starts the payment-status workflow.
+
 After payment, the Stripe webhook:
+
 1. Validates the webhook payload.
 2. Reads the payment intent.
 3. Finds the corresponding Checkout session.
 4. Retrieves the booking ID from metadata.
 5. Marks the booking as paid.
 6. Emits an Inngest event for confirmation email delivery.
-Event-Driven Workflows with Inngest
+
+## Event-Driven Workflows with Inngest
+
 The project uses Inngest for asynchronous workflows and scheduled tasks.
-Implemented workflows include:
-User synchronization
+
+### Implemented Workflows
+
+#### User Synchronization
+
 Clerk events are used to synchronize users with MongoDB:
+
+```text
 clerk/user.created
 clerk/user.updated
 clerk/user.deleted
-Booking expiration
+```
+
+#### Booking Expiration
+
+```text
 app/checkpayment
-        ↓
-wait 10 minutes
-        ↓
-check booking payment
-        ↓
-release seats if unpaid
-Booking confirmation
+      ↓
+Wait 10 minutes
+      ↓
+Check booking payment
+      ↓
+Release seats if unpaid
+```
+
+#### Booking Confirmation
+
+```text
 app/show.booked
-        ↓
-fetch booking + user + show
-        ↓
-send confirmation email
-Show reminders
+      ↓
+Fetch booking + user + show
+      ↓
+Send confirmation email
+```
+
+#### Show Reminders
+
 A scheduled Inngest function checks upcoming shows and sends reminder emails.
-New-show notifications
+
+#### New-Show Notifications
+
 When a new show is added, the application emits:
+
+```text
 app/show.added
+```
+
 and sends notifications to users.
-Authentication & Authorization
+
+---
+
+## Authentication & Authorization
+
 Authentication is handled using Clerk.
-The frontend obtains Clerk session tokens and sends them to the backend using the Authorization header.
+
+The frontend obtains Clerk session tokens and sends them to the backend using the `Authorization` header.
+
 Example:
+
+```http
 Authorization: Bearer <token>
+```
+
 The backend uses Clerk Express middleware to access the authenticated user's identity.
-Admin authorization
+
+### Admin Authorization
+
 Admin show creation uses the user's Clerk private metadata:
+
+```javascript
 privateMetadata.role === "admin"
+```
+
 This is checked by the backend middleware before allowing the protected show-creation route.
-API Overview
-Shows
+
+---
+
+## API Overview
+
+### Shows
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/show/now-playing` | Fetch currently playing movies from TMDB |
@@ -250,36 +351,50 @@ Shows
 | GET | `/api/show/all` | Get available shows |
 | GET | `/api/show/:movieId` | Get movie details and upcoming show times |
 | DELETE | `/api/show/movie/:movieId` | Delete shows for a movie |
-Bookings
+
+### Bookings
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | POST | `/api/booking/create` | Create a booking and Stripe Checkout session |
 | GET | `/api/booking/seats/:showId` | Get occupied seats |
 | POST | `/api/booking/regenerate-payment-link` | Regenerate an unpaid booking payment link |
-Users
+
+### Users
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/user/bookings` | Get user's bookings |
 | POST | `/api/user/update-favorite` | Add/remove a favorite movie |
 | GET | `/api/user/favorites` | Get favorite movies |
-Admin
+
+### Admin
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/admin/is-admin` | Check admin status |
 | GET | `/api/admin/dashboard` | Get dashboard data |
 | GET | `/api/admin/all-shows` | List shows |
 | GET | `/api/admin/all-bookings` | List bookings |
-Payments
+
+### Payments
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | POST | `/api/stripe` | Receive Stripe webhook events |
-Inngest
+
+### Inngest
+
 | Endpoint | Purpose |
 |---|---|
 | `/api/inngest` | Serve registered Inngest functions |
-Project Structure
+
+---
+
+## Project Structure
+
+```text
 BookmyshowClone/
-│
 ├── client/
 │   ├── public/
 │   ├── assets/
@@ -321,9 +436,16 @@ BookmyshowClone/
 │   └── server.js
 │
 └── README.md
-Getting Started
-Prerequisites
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
 Make sure the following are installed:
+
 - Node.js 18+
 - npm
 - MongoDB
@@ -332,21 +454,45 @@ Make sure the following are installed:
 - Stripe account
 - Inngest account/local development environment
 - SMTP credentials for email delivery
-Installation
-1. Clone the repository
+
+### Installation
+
+#### 1. Clone the repository
+
+```bash
 git clone https://github.com/jaydevsingh1611/BookmyshowClone.git
 cd BookmyshowClone
-2. Install backend dependencies
+```
+
+#### 2. Install backend dependencies
+
+```bash
 cd server
 npm install
-3. Install frontend dependencies
+```
+
+#### 3. Install frontend dependencies
+
+```bash
 cd ../client
 npm install
-Environment Variables
-Server
+```
+
+---
+
+## Environment Variables
+
+### Server
+
 Create:
+
+```text
 server/.env
+```
+
 Example:
+
+```env
 MONGODB_URI=
 CLERK_SECRET_KEY=
 STRIPE_SECRET_KEY=
@@ -355,72 +501,148 @@ TMDB_API_KEY=
 SMTP_USER=
 SMTP_PASS=
 SENDER_EMAIL=
-Do not commit real credentials or secret keys to GitHub.
-Client
+```
+
+> **Important:** Never commit real credentials or secret keys to GitHub.
+
+### Client
+
 Create:
+
+```text
 client/.env
+```
+
 Example:
+
+```env
 VITE_BASE_URL=http://localhost:3000
 VITE_CLERK_PUBLISHABLE_KEY=
 VITE_TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p/original
 VITE_CURRENCY=$
+```
+
 Use the variable names expected by the actual application configuration.
-Running Locally
-Start the backend
+
+---
+
+## Running Locally
+
+### Start the Backend
+
+```bash
 cd server
 npm run dev
+```
+
 The backend runs on:
+
+```text
 http://localhost:3000
-Start the frontend
+```
+
+### Start the Frontend
+
 In another terminal:
+
+```bash
 cd client
 npm run dev
+```
+
 The Vite development server will display the local frontend URL.
-Important Engineering Decisions
-1. Clerk for authentication
+
+---
+
+## Important Engineering Decisions
+
+### 1. Clerk for Authentication
+
 Instead of implementing password storage and session management from scratch, the application delegates authentication to Clerk.
+
 The backend still uses the authenticated Clerk user ID to associate bookings and user data.
-2. MongoDB for movie/show/booking data
+
+### 2. MongoDB for Movie, Show & Booking Data
+
 The application's data is naturally document-oriented:
+
 - Movie metadata contains nested genres and cast information.
 - Shows reference movies and maintain occupied-seat state.
 - Bookings contain selected seats and payment state.
+
 Mongoose provides schema definitions and population between related documents.
-3. Inngest for asynchronous workflows
+
+### 3. Inngest for Asynchronous Workflows
+
 Tasks such as:
-- releasing unpaid seats,
-- sending confirmation emails,
-- sending show reminders,
-- synchronizing Clerk users,
+
+- Releasing unpaid seats
+- Sending confirmation emails
+- Sending show reminders
+- Synchronizing Clerk users
+
 do not need to block the request/response cycle.
+
 They are handled as event-driven or scheduled workflows.
-4. Stripe webhooks for payment confirmation
+
+### 4. Stripe Webhooks for Payment Confirmation
+
 The client redirect is not treated as the source of truth for payment status.
+
 The backend updates the booking after receiving a Stripe payment event.
+
 This separates:
+
+```text
 User navigation
-from:
+      ↓
 Payment confirmation
+```
+
 which is important for payment workflows.
-5. TMDB as the movie data source
+
+### 5. TMDB as the Movie Data Source
+
 Movie metadata is retrieved from TMDB rather than manually maintained in the application.
+
 When an admin schedules a movie that is not already stored locally, the backend fetches the movie and credits data and persists it in MongoDB.
-Production Hardening / Known Limitations
+
+---
+
+## Production Hardening / Known Limitations
+
 This project is a learning/portfolio implementation and has areas that should be strengthened before treating it as a production ticketing system.
-Atomic seat reservation
-The current flow checks seat availability and then updates occupiedSeats in separate database operations.
+
+### Atomic Seat Reservation
+
+The current flow checks seat availability and then updates `occupiedSeats` in separate database operations.
+
 For high-concurrency production traffic, this should be replaced with an atomic reservation strategy or MongoDB transaction so two simultaneous requests cannot reserve the same seat between the availability check and update.
-Admin route protection
-The show creation route currently uses the protectAdmin middleware. Other admin endpoints should also enforce backend authorization consistently before production deployment.
-Stripe webhook secret
+
+### Admin Route Protection
+
+The show creation route currently uses the `protectAdmin` middleware. Other admin endpoints should also enforce backend authorization consistently before production deployment.
+
+### Stripe Webhook Secret
+
 The webhook verification should use a dedicated Stripe webhook signing secret rather than the Stripe API secret key.
-Validation and error handling
+
+### Validation and Error Handling
+
 The API currently returns many application errors as JSON responses without consistently using HTTP status codes.
+
 A production version should introduce centralized validation and error-handling middleware.
-Booking consistency
+
+### Booking Consistency
+
 A production booking system should consider transactions, temporary seat holds, expiration semantics, and stronger consistency guarantees around seat inventory and payment state.
-Future Improvements
+
+---
+
+## Future Improvements
+
 Potential next steps for the project:
+
 - [ ] Add MongoDB transactions for booking/seat reservation
 - [ ] Add temporary seat-hold state with explicit expiration
 - [ ] Add Redis for high-frequency seat availability reads
@@ -435,8 +657,13 @@ Potential next steps for the project:
 - [ ] Add CI/CD pipeline
 - [ ] Add automated Stripe webhook tests
 - [ ] Add load/concurrency testing for booking flows
-What I Learned
+
+---
+
+## What I Learned
+
 This project helped me work through several backend problems beyond basic CRUD:
+
 - Designing REST APIs around multiple related resources
 - Managing authentication with an external identity provider
 - Modeling movies, shows, bookings, and users with MongoDB/Mongoose
@@ -446,14 +673,27 @@ This project helped me work through several backend problems beyond basic CRUD:
 - Integrating third-party APIs such as TMDB
 - Connecting frontend state with authenticated backend APIs
 - Thinking about concurrency and consistency in a booking system
-- Identifying the difference between a working prototype and a production-ready system
-Demo
-Add the deployed frontend URL here once you have a stable public deployment.
-Live Demo: <https://bookmyshowclone-1-k0xi.onrender.com/>
-Author
-Jaydev Singh Chahar
+- Understanding the difference between a working prototype and a production-ready system
+
+---
+
+## Demo
+
+Live Demo: https://bookmyshowclone-1-k0xi.onrender.com/
+
+---
+
+## Author
+
+**Jaydev Singh Chahar**
+
 B.Tech — NIT Patna
-- GitHub: jaydevsingh1611
+
+- GitHub: [jaydevsingh1611](https://github.com/jaydevsingh1611)
 - Email: jaydevsinghchahar1611@gmail.com
-License
+
+---
+
+## License
+
 This project is intended for educational and portfolio purposes.
